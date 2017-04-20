@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.devblocks.com/schema/plugin.xsd">
+	<id>cerberusweb.contracts</id>
+	<name>Contract Tracking</name>
+	<description>This plugin adds contract record</description>
+	<author>v.trubin</author>
+	<version>0.0.32</version>
+	<!--<image>plugin.png</image>-->
+
+	<!-- Requirements -->
+
+	<requires>
+		<app_version min="7.1" max="7.3.99" />
+		<!--<php_extension name="curl" />-->
+	</requires>
+
+	<!-- Plugin Dependencies -->
+	
+	<dependencies>
+		<require plugin_id="cerberusweb.core" version="7.3.0" />
+	</dependencies>
+
+	<!-- Patches -->
+	
+	<patches>
+		<patch version="6.4.0" revision="1" file="patches/6.4.0.php" />
+	</patches>
+
+    <!-- Activity Points -->
+
+    <activity_points>
+        <activity point="contract.created">
+            <param key="label_key" value="Contract Created" />
+            <param key="string_key" value="activities.contract.created" />
+            <param key="options" value="" />
+        </activity>
+    </activity_points>
+
+    <!-- Privileges -->
+
+    <acl>
+        <!--<priv id="calls.actions.create" label="acl.calls.actions.create" />-->
+        <priv id="contracts.actions.update_all" label="acl.contracts.actions.update_all" />
+        <!--<priv id="calls.actions.update_nobody" label="acl.calls.actions.update_nobody" />-->
+        <priv id="contracts.view.actions.export" label="acl.contracts.view.actions.export" />
+    </acl>
+	
+	<!-- Exported Classes -->
+	
+	<class_loader>
+		<file path="api/dao/contract.php">
+			<!--<class name="Context_Contract" />-->
+			<class name="DAO_Contract" />
+			<class name="Model_Contract" />
+			<class name="SearchFields_Contract" />
+			<class name="View_Contract" />
+		</file>
+		<file path="api/events/abstract_event_contract.php">
+			<class name="AbstractEvent_Contract" />
+		</file>
+		<file path="api/events/contract_macro.php">
+			<class name="Event_ContractMacro" />
+		</file>
+	</class_loader>
+
+	<!-- Extensions -->
+
+	<extensions>
+	
+		<!-- Contexts -->
+		
+		<extension point="devblocks.context">
+			<id>cerberusweb.contexts.contract</id>
+			<name>Contract</name>
+			<class>
+				<file>api/dao/contract.php</file>
+				<name>Context_Contract</name>
+			</class>
+			<params>
+				<param key="names">
+					<value>
+						<data key="contract" value="singular" />
+						<data key="contracts" value="plural" />
+					</value>
+				</param>
+				<param key="alias" value="contract" />
+				<param key="dao_class" value="DAO_Contract" />
+				<param key="view_class" value="View_Contract" />
+				<param key="options">
+					<value>
+                        <data key="cards" />
+                        <data key="create" />
+                        <data key="custom_fields" />
+                        <data key="links" />
+                        <data key="search" />
+                        <data key="snippets" />
+                        <data key="va_variable" />
+                        <data key="workspace" />
+						<!--<data key="create" />
+						<data key="custom_fields" />
+						<data key="find" />
+						<data key="snippets" />
+						<data key="va_variable" />
+						<data key="workspace" />-->
+					</value>
+				</param>
+			</params>
+		</extension>
+		
+		<!-- Events -->
+		
+		<extension point="devblocks.event">
+			<id>event.macro.contract</id>
+			<name>Custom contract behavior</name>
+			<class>
+				<file>api/events/contract_macro.php</file>
+				<name>Event_ContractMacro</name>
+			</class>
+			<params>
+				<param key="macro_context" value="cerberusweb.contexts.contract" />
+				<param key="contexts">
+					<value>
+						<data key="cerberusweb.contexts.app" />
+						<data key="cerberusweb.contexts.group" />
+						<data key="cerberusweb.contexts.role" />
+						<data key="cerberusweb.contexts.worker" />
+					</value>
+				</param>
+			</params>
+		</extension>
+
+        <!-- Event Actions -->
+
+        <extension point="devblocks.event.action">
+            <id>contracts.event.action.post</id>
+            <name>Log ContractGlobal Event Action</name>
+            <class>
+                <file>api/App.php</file>
+                <name>WgmContracts_EventActionPost</name>
+            </class>
+            <params>
+                <param key="label" value="Create contract" />
+                <param key="events">
+                    <value>
+                        <data key="*" />
+                    </value>
+                </param>
+            </params>
+        </extension>
+		<!-- Profile Page Sections -->
+		
+		<extension point="cerberusweb.ui.page.section">
+			<id>contracts.page.profiles.contract</id>
+			<name>Contract Section</name>
+			<class>
+				<file>api/profiles/contract.php</file>
+				<name>PageSection_ProfilesContract</name>
+			</class>
+			<params>
+				<param key="page_id" value="core.page.profiles" />
+				<param key="uri" value="contract" />
+			</params>
+		</extension>
+
+		<!--REST Api-->
+		<extension point="cerberusweb.rest.controller">
+			<id>contracts.rest.controller.contracts</id>
+			<name>Contracts</name>
+			<class>
+				<file>api/rest/contracts.php</file>
+				<name>ChRest_Contracts</name>
+			</class>
+			<params>
+				<param key="uri" value="contracts" />
+			</params>
+		</extension>
+	
+	</extensions>
+</plugin>
